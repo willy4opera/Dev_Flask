@@ -15,8 +15,10 @@ from flask_login import UserMixin
 import json
 import os
 
+basedir = os.path.abspath(os.path.dirname(__file__))
+
 app = app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'site.db')
 db = SQLAlchemy(app)
 migrate = Migrate(app, db, render_as_batch=True)
 
