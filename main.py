@@ -15,13 +15,18 @@ from flask_login import UserMixin
 import json
 import os
 
+
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = app = Flask(__name__)
+app.config['SECRET_KEY'] = 'hjshjhdjah kjshkjdhjs'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'site.db')
 db = SQLAlchemy(app)
 migrate = Migrate(app, db, render_as_batch=True)
 
+UPLOAD_FOLDER = 'static/images/'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 class Services(db.Model):
   id = db.Column(db.Integer, primary_key=True)
@@ -38,6 +43,7 @@ class User(db.Model, UserMixin):
   last_name = db.Column(db.String(150))
   dateofbirth = db.Column(db.DateTime)
   address = db.Column(db.String(300))
+  phone_num = db.Column(db.Integer, unique=True)
   Services = db.relationship('Services')
   profile_pic = profile_pic = db.Column(db.String(), nullable=True)
 
@@ -53,7 +59,7 @@ def login():
             if check_password_hash(user.password, password):
                 flash('Logged in successfully!', category='success')
                 login_user(user, remember=True)
-                return redirect(url_for('views.home'))
+                return redirect(url_for('home'))
             else:
                 flash('Incorrect password, try again.', category='error')
         else:
@@ -110,12 +116,13 @@ def sign_up():
            db.session.commit()
            saver.save(os.path.join(app.config['UPLOAD_FOLDER'], pic_name))
         else:
-            new_user = User(email=email, first_name=first_name, password=generate_password_hash(password1, method='pbkdf2:sha1', salt_length=8))
+            new_user = User(email=email, dateofbirth=dateofbirth, address=address, phone_num=phone_num, last_name=last_name, first_name=first_name, password=generate_password_hash(password1, method='pbkdf2:sha1', salt_length=8))
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user, remember=True)
             flash('Account created!', category='success')
-            return redirect(url_for('views.home'))
+            print("Account Create")
+            return redirect(url_for('home'))
 
     return render_template("register.html", user=current_user)
 
