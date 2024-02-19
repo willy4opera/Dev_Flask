@@ -1,16 +1,39 @@
-from data import create_app, db
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from os import path
+from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from models import User
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
 from flask import Blueprint, render_template, request, flash, jsonify
 from flask_login import login_required, current_user
-from models import Note
+from sqlalchemy.sql import func
+from flask_login import UserMixin
 import json
 
-app = create_app()
+
+app = app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+
+class Note(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+  data = db.Column(db.String(10000))
+  date = db.Column(db.DateTime(timezone=True), default=func.now())
+  user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+
+class User(db.Model, UserMixin):
+  id = db.Column(db.Integer, primary_key=True)
+  email = db.Column(db.String(150), unique=True)
+  password = db.Column(db.String(150))
+  first_name = db.Column(db.String(150))
+  last_name = db.Column(db.String(150))
+  notes = db.relationship('Note')
+
+
 
 
 @app.route('/login', methods=['GET', 'POST'])
