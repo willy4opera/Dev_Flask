@@ -1,8 +1,8 @@
-"""Initial migration.
+"""My data base was migrated.
 
-Revision ID: a83988b56257
+Revision ID: 6d5795860679
 Revises: 
-Create Date: 2024-02-19 11:44:53.051903
+Create Date: 2024-02-20 06:56:00.780388
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'a83988b56257'
+revision = '6d5795860679'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -26,9 +26,11 @@ def upgrade():
     sa.Column('last_name', sa.String(length=150), nullable=True),
     sa.Column('dateofbirth', sa.DateTime(), nullable=True),
     sa.Column('address', sa.String(length=300), nullable=True),
+    sa.Column('phone_num', sa.Integer(), nullable=True),
     sa.Column('profile_pic', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('email')
+    sa.UniqueConstraint('email'),
+    sa.UniqueConstraint('phone_num')
     )
     op.create_table('services',
     sa.Column('id', sa.Integer(), nullable=False),
